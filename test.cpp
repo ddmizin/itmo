@@ -2,7 +2,8 @@
 #include <iostream>
 
 const int MAXN = 1000000;  // максимум n по условию
-uint32_t arr[MAXN]; 
+uint32_t arr[MAXN];
+uint32_t temp[MAXN]; // temp[r - l] 
 
 uint32_t cur = 0;              // текущее значение генератора
 // Генератор 24-битных чисел по условию задачи
@@ -13,11 +14,11 @@ uint32_t nextRand24(uint32_t a, uint32_t b) {
 }
 
 uint64_t Merge(uint32_t *arr, uint64_t l, uint64_t mid, uint64_t r){
-    int i = 0;
-    int j = 0;
+    uint64_t i = 0;
+    uint64_t j = 0;
     uint64_t result = 0;
-    uint32_t temp[r - l]; // temp[r - l]
-    while ((l + i < mid) && (mid + j < r)){
+
+    while ((i < mid) && (j < r)){
         if (arr[l + i] < arr[mid + j]){
             temp[i + j] = arr[l + i];
             ++i;
@@ -28,11 +29,11 @@ uint64_t Merge(uint32_t *arr, uint64_t l, uint64_t mid, uint64_t r){
             result += (mid - i + 1);
         }
     }
-    while (l + i < mid){
+    while (i < mid){
         temp[i + j] = arr[l + i];
         ++i;
     }
-    while (mid + j < r){
+    while (j < r){
         temp[i + j] = arr[mid + j];
         ++j;
     }
@@ -45,14 +46,12 @@ uint64_t Merge(uint32_t *arr, uint64_t l, uint64_t mid, uint64_t r){
 uint64_t Merge_sort(uint32_t *arr, uint64_t l, uint64_t r){
     uint64_t result = 0;
     if (l < r){
-    
-
-        int mid = (l + r) / 2;
+        int mid = l + (r - l)/2 + 1;
         result += Merge_sort(arr, l, mid);
-        result += Merge_sort(arr, mid, r);
+        result += Merge_sort(arr, mid + 1, r);
         result += Merge(arr, l, mid, r);
-        return result;
     }
+    return result;
 }
 
 int main() {

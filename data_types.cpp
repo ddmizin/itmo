@@ -14,5 +14,4 @@ int main() {
     long double ld = 1e15;       // длинное дробное (как правило, 16 байт)
     auto x = 42;  // int
     std::string st = "Hello";
-
 }

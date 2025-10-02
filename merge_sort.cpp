@@ -1,39 +1,36 @@
 #include <iostream>
 
 void Merge(int *arr, int l, int mid, int r){
-    int i = 0;
-    int j = 0;
+    int i = l;
+    int j = mid + 1;
+    int k = l;
     int temp[100]; // temp[r - l]
-    while ((l + i < mid) && (mid + j < r)){
-        if (arr[l + i] < arr[mid + j]){
-            temp[i + j] = arr[l + i];
-            ++i;
+    while ((i <= mid) && (j <= r)){
+        if (arr[i] < arr[j]){
+            temp[k++] = arr[i++];
         }
         else {
-            temp[i + j] = arr[mid + j];
-            ++j;
+            temp[k++] = arr[j++];
         }
     }
-    while (l + i < mid){
-        temp[i + j] = arr[l + i];
-        ++i;
+    while (i < mid){
+        temp[k++] = arr[i++];
     }
-    while (mid + j < r){
-        temp[i + j] = arr[mid + j];
-        ++j;
+    while (j < r){
+        temp[k++] = arr[j++];
     }
-    for (int k = 0; k < i + j; ++k){
-        arr[l + k] = temp[k];
+    for (int idx = l; idx < r; ++idx){
+        arr[idx] = temp[idx];
     }
 }
 
 void Merge_sort(int *arr, int l, int r){
-    if (l + 1 >= r){
+    if (l >= r){
         return;
     }
-    int mid = (l + r) / 2;
+    int mid = l + (r - l) / 2;
     Merge_sort(arr, l, mid);
-    Merge_sort(arr, mid, r);
+    Merge_sort(arr, mid + 1, r);
     Merge(arr, l, mid, r);
 }
 

@@ -1,73 +1,68 @@
-#include <cstdint>
 #include <iostream>
 
-const int MAXN = 1000000;  // максимум n по условию
-uint32_t arr[MAXN];
-uint32_t temp[MAXN]; // temp[r - l] 
-
-uint32_t cur = 0;              // текущее значение генератора
-// Генератор 24-битных чисел по условию задачи
+const int MAXN = 100000000;
+uint32_t temp[MAXN];
+uint32_t cur = 0;  // беззнаковое 32-битное число
+// Генератор 24-битного числа
 uint32_t nextRand24(uint32_t a, uint32_t b) {
-    // 32-битные переполнения (uint32_t автоматически усекает до 2^32)
-    cur = cur * a + b;
-    return cur >> 8;  // берём старшие 24 бита (сдвиг вправо на 8)
+    cur = cur * a + b;      // вычисляется с переполнениями по модулю 2^32
+    return cur >> 8;         // число от 0 до 2^24 - 1
 }
 
-uint64_t Merge(uint32_t *arr, uint64_t l, uint64_t mid, uint64_t r){
-    uint64_t i = 0;
-    uint64_t j = 0;
-    uint64_t result = 0;
+// Генератор 32-битного числа на основе двух 24-битных
+uint32_t nextRand32(uint32_t a, uint32_t b) {
+    uint32_t x = nextRand24(a, b);
+    uint32_t y = nextRand24(a, b);
+    return (x << 8) ^ y;     // число от 0 до 2^32 - 1
+}
 
-    while ((i < mid) && (j < r)){
-        if (arr[l + i] < arr[mid + j]){
-            temp[i + j] = arr[l + i];
-            ++i;
+void Merge(uint32_t *arr, uint64_t left, uint64_t mid, uint64_t right){
+    uint64_t i = left;
+    uint64_t j = mid + 1;
+    uint64_t c = left;
+    while ((i <= mid) && (j <= right)){
+        if (arr[i] <= arr[j]){
+            temp[c++] = arr[i++];
         }
         else {
-            temp[i + j] = arr[mid + j];
-            ++j;
-            result += (mid - i + 1);
+            temp[c++] = arr[j++];
         }
     }
-    while (i < mid){
-        temp[i + j] = arr[l + i];
-        ++i;
+    while (i <= mid){
+        temp[c++] = arr[i++];
     }
-    while (j < r){
-        temp[i + j] = arr[mid + j];
-        ++j;
+    while (j <= right){
+        temp[c++] = arr[j++];
     }
-    for (int k = 0; k < i + j; ++k){
-        arr[l + k] = temp[k];
+    for (uint64_t idx = left; idx <= right; ++idx){
+        arr[idx] = temp[idx];
     }
-    return result;
 }
 
-uint64_t Merge_sort(uint32_t *arr, uint64_t l, uint64_t r){
-    uint64_t result = 0;
-    if (l < r){
-        int mid = l + (r - l)/2 + 1;
-        result += Merge_sort(arr, l, mid);
-        result += Merge_sort(arr, mid + 1, r);
-        result += Merge(arr, l, mid, r);
+void Merge_sort(uint32_t *arr, uint64_t left, uint64_t right){
+    if (left >= right){
+        return;
     }
-    return result;
+    uint64_t mid = left + (right - left) / 2;
+    Merge_sort(arr, left, mid);
+    Merge_sort(arr, mid + 1, right);
+    Merge(arr, left, mid, right);
 }
 
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
 
-    uint32_t n, m, a, b;
-    std::cin >> n >> m >> a >> b;
+    uint32_t n, k, a, b;
+    std::cin >> n >> k >> a >> b;
 
-    // Генерируем n элементов
+    uint32_t arr[n];
+
     for (uint32_t i = 0; i < n; i++) {
-        uint32_t x = nextRand24(a, b) % m; // получаем 24-битное значение по модулю m
-        arr[i] = x;                        // записываем в массив
+        arr[i] = nextRand32(a, b);  // генерируем i-й элемент
     }
-    
-    // Далее используйте arr[0..n-1] для подсчёта инверсий
-    uint64_t result = Merge_sort(arr, 0, n - 1);
-    std::cout << result;
+
+    // здесь будет ваш алгоритм
+    Merge_sort(arr, 0, n - 1);
+    std::cout << arr[k - 1];
 }

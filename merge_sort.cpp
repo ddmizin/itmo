@@ -1,37 +1,37 @@
 #include <iostream>
 
-void Merge(int *arr, int l, int mid, int r){
-    int i = l;
+void Merge(int *arr, int left, int mid, int right){
+    int i = left;
     int j = mid + 1;
-    int k = l;
+    int k = left;
     int temp[100]; // temp[r - l]
-    while ((i <= mid) && (j <= r)){
-        if (arr[i] < arr[j]){
+    while ((i <= mid) && (j <= right)){
+        if (arr[i] <= arr[j]){
             temp[k++] = arr[i++];
         }
         else {
             temp[k++] = arr[j++];
         }
     }
-    while (i < mid){
+    while (i <= mid){
         temp[k++] = arr[i++];
     }
-    while (j < r){
+    while (j <= right){
         temp[k++] = arr[j++];
     }
-    for (int idx = l; idx < r; ++idx){
+    for (int idx = left; idx <= right; ++idx){
         arr[idx] = temp[idx];
     }
 }
 
-void Merge_sort(int *arr, int l, int r){
-    if (l >= r){
+void Merge_sort(int *arr, int left, int right){
+    if (left >= right){
         return;
     }
-    int mid = l + (r - l) / 2;
-    Merge_sort(arr, l, mid);
-    Merge_sort(arr, mid + 1, r);
-    Merge(arr, l, mid, r);
+    int mid = left + (right - left) / 2;
+    Merge_sort(arr, left, mid);
+    Merge_sort(arr, mid + 1, right);
+    Merge(arr, left, mid, right);
 }
 
 int main(){
@@ -41,7 +41,7 @@ int main(){
     for (size_t i = 0; i < n; ++i){
         std::cin >> arr[i];
     }
-    Merge_sort(arr, 0, n);
+    Merge_sort(arr, 0, n - 1);
     for (size_t i = 0; i < n; ++i){
         std::cout << arr[i] << " ";
     }

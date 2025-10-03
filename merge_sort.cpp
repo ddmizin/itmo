@@ -4,7 +4,7 @@ void Merge(int *arr, int left, int mid, int right){
     int i = left;
     int j = mid + 1;
     int k = left;
-    int temp[100]; // temp[r - l]
+    int temp[1000000]; // temp[r - l]
     while ((i <= mid) && (j <= right)){
         if (arr[i] <= arr[j]){
             temp[k++] = arr[i++];
@@ -37,7 +37,7 @@ void Merge_sort(int *arr, int left, int right){
 int main(){
     int n;
     std::cin >> n;
-    int arr[100];
+    int arr[1000000];
     for (size_t i = 0; i < n; ++i){
         std::cin >> arr[i];
     }

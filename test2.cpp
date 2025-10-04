@@ -16,7 +16,7 @@ uint32_t nextRand32(uint32_t a, uint32_t b) {
     return (x << 8) ^ y;     // число от 0 до 2^32 - 1
 }
 
-int Partition(uint32_t arr[], uint64_t l, uint64_t r){
+int Partition(uint32_t arr[], uint64_t l, uint64_t r, uint64_t k){
     uint64_t pivot = arr[(l + r) / 2];
     uint64_t i = l - 1;
     uint64_t j = r + 1;
@@ -30,11 +30,15 @@ int Partition(uint32_t arr[], uint64_t l, uint64_t r){
     }
 }
 
-void Quick_sort(uint32_t arr[], uint64_t l, uint64_t r){
+void Quick_sort(uint32_t arr[], uint64_t l, uint64_t r, uint64_t k){
     if (l < r){
-        int p = Partition(arr, l, r);
-        Quick_sort(arr, l, p);
-        Quick_sort(arr, p + 1, r);
+        uint64_t pivot = Partition(arr, l, r, k);
+        if (k - 1 <= pivot) {
+            Quick_sort(arr, l, pivot, k);
+        }
+        else {
+            Quick_sort(arr, pivot + 1, r, k);
+        }
     }
 }
 
@@ -52,6 +56,6 @@ int main(){
     }
 
     // здесь будет ваш алгоритм
-    Quick_sort(arr, 0, n - 1);
+    Quick_sort(arr, 0, n - 1, k);
     std::cout << arr[k - 1];
 }

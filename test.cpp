@@ -1,33 +1,79 @@
 #include <iostream>
-#include <algorithm>
+#include <fstream>
 
-void sort_by_counting(int n, int k, int A[]){
-    int B[100];
-    std::cout << '\n';
-    int P[100] = {0};
-    for (size_t i = 0; i < n; ++i){
-        P[A[i]] += 1;
+bool CompareStringPrefix(const char* str, const char* prefix) {
+    int i = 0;
+    while (prefix[i] != '\0') {
+        if (str[i] != prefix[i]) {
+            return false;
+        }
+        i++;
     }
-    for (size_t i = 1; i <= k; ++i) {
-        P[i] += P[i - 1];
-    }
-    for (size_t i = 0; i < n; ++i){
-        B[P[A[i]] - 1] = A[i];
-        --P[A[i]];
-        std::cout << P[A[i]] << " ";
-    }
+    return true;
 }
 
-int main(){
-    int n;
-    std::cin >> n;
-    int k = -1000000;
-    int A[100];
-    int curr = 0;
-    for (size_t i = 0; i < n; ++i){
-        std::cin >> curr;
-        A[i] = curr;
-        k = std::max(k, curr);
+struct Files {
+    char* DataKeys[100000];
+    char* DataValues[100000];
+};
+
+int main(int argc, char* argv[]){
+    std::ifstream TemplateFile;
+    std::ifstream DataFile;
+    char* TemplatePath;
+    char* DataPath;
+    char* OutputPath;
+    bool bTemplate = false;
+    bool bData = false;
+    for (int i = 1; i < argc; ++i){
+        if (CompareStringPrefix(argv[i], "-t")){
+            if (i + 1 < argc){
+                TemplatePath = argv[++i];
+                bTemplate = true;
+            }
+            else {
+                return 2;
+            }
+        }
+        else if (CompareStringPrefix(argv[i], "-d")){
+            if (i + 1 < argc){
+                DataPath = argv[++i];
+                bData = true;
+            }
+            else {
+                return 2;
+            }
+        }
+        else if (CompareStringPrefix(argv[i], "-o")){
+            if (i + 1 < argc){
+                OutputPath = argv[++i];
+            }
+            else {
+                return 2;
+            }
+        }
+        else if (CompareStringPrefix(argv[i], "--template=")){
+            TemplatePath = argv[i] + 11;
+            bTemplate = true;
+        }
+        else if (CompareStringPrefix(argv[i], "--data=")){
+            DataPath = argv[i] + 7;
+            bData = true;
+        }
+        else if (CompareStringPrefix(argv[i], "--output=")){
+            OutputPath = argv[i] + 9;
+        }
+        else {
+            return 2;
+        }
     }
-    sort_by_counting(n, k, A);
+    std::cout << "Template: " << TemplatePath << '\n';
+    std::cout << "Data: " << DataPath << '\n';
+    std::cout << "Output: " << OutputPath << '\n';
+    if (!bTemplate || !bData){
+        std::cout << "2";
+        return 2;
+    }
+    DataFile.open(DataPath);
+    
 }

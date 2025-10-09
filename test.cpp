@@ -25,7 +25,8 @@ bool CompareString(const char* str1, const char* str2) {
         }
         i++;
     }
-    return true;
+    std::cout << str1 << "//" << str2 << '\n';
+    return str1[i] == str2[i];
 }
 
 void CopyString(char* new_string, const char* source) {

@@ -2,8 +2,8 @@
 #include <fstream>
 
 struct Data {
-    char DataKey[100];
-    char DataValue[100];
+    char DataKey[101];
+    char DataValue[101];
 };
 
 bool bCompareStringPrefix(const char* str, const char* prefix) {
@@ -93,6 +93,15 @@ const char* FindChar(const char* str, char c) {
     return nullptr;
 }
 
+const char* FindValue(const Data* Data, int count, const char* key) {
+    for (int i = 0; i < count; i++) {
+        if (bCompareString(Data[i].DataKey, key)) {
+            return Data[i].DataValue;
+        }
+    }
+    return nullptr;
+}
+
 bool CommandLine(int argc, char* argv[], char*& TemplatePath, char*& DataPath, char*& OutputPath){
     bool bTemplate = false;
     bool bData = false;
@@ -144,13 +153,168 @@ bool CommandLine(int argc, char* argv[], char*& TemplatePath, char*& DataPath, c
     return TemplatePath != nullptr && DataPath != nullptr;
 }
 
-int ReadData(const char* DataPath, Data* Data, int& data_count){
+int ReadData(const char* DataPath, Data* Data, int& count){
         std::ifstream DataFile(DataPath);
         if (!DataFile.is_open()){
             return 3;
         }
-        char line[4096];
-        data_count = 0;
+        char line[10000];
+        count = 0;
+        while (DataFile.getline(line, 10000)){
+            DeleteSpaces(line);
+            if (line[0] == '/0'){
+                continue;
+            }
+            if (line[0] == '#'){
+                continue;
+            }
+            if (line[0] == '/' && line[1] == '/'){
+                continue;
+            }
+            const char* separator = FindChar(line, '=');
+            if (separator == nullptr){
+                continue;
+            }
+            int key_l = separator - line;
+            if (key_l > 100){
+                continue;
+            }
+            char key[101];
+            for (int i = 0; i < key_l; ++i){
+                key[i] = line[i];
+            }
+            key[key_l] = '\0';
+            const char* value_start = separator + 1;
+            int value_l = LengthString(value_start);
+            if (value_l > 100){
+                continue;
+            }
+            char value[100];
+            CopyString(value, value_start);
+            DeleteSpaces(value);
+            if (LengthString(key) == 0 || LengthString(value) == 0){
+                continue;
+            }
+            for (int i = 0; i < key_l; ++i){
+                if (!bIsValidSymbol(key[i])){
+                    continue;
+                }
+            }
+            for (int i = 0; i < value_l; ++i){
+                if (!bIsValidSymbol(value[i])){
+                    continue;
+                }
+            }
+            bool key_repeated = false;
+            for (int i = 0; i < count; ++i){
+                if (bCompareString(key, Data[i].DataKey)){
+                    CopyString(Data[i].DataValue, value);
+                    key_repeated = true;
+                    break;
+                }
+            }
+            if (!key_repeated){
+                if (count < 1024){
+                    CopyString(Data[count].DataKey, key);
+                    CopyString(Data[count].DataValue, value);
+                    ++count;
+                }
+            }
+        }
+        DataFile.close();
+        return 0;
+}
+
+int Template(const char* TemplatePath, const char* OutputPath, const Data* Data, int count){
+    std::ifstream TemplateFile(TemplatePath);
+    if (!TemplateFile.is_open()){
+        return 3;
+    }
+    std::ofstream OutputFile;
+    std::ostream* OutputStream;
+    if (OutputPath != nullptr){
+        OutputFile.open(OutputPath);
+        if (!OutputFile.is_open()){
+            return 3;
+        }
+        OutputStream = &OutputFile;
+    }
+    else {
+        OutputStream = &std::cout;
+    }
+    char curr;
+    int pos = 0;
+    char key_buffer[101];
+    int key_pos = 0;
+    while (TemplateFile.get(curr)){
+        switch (pos){
+            case 0:
+                if (curr == '{'){
+                    pos = 1;
+                }
+                else {
+                    *OutputStream << curr;
+                }
+                break;
+            case 1:
+                if (curr == '{'){
+                    pos = 2;
+                    key_pos = 0;
+                }
+                else {
+                    *OutputStream << '{' << curr;
+                    pos = 0;
+                }
+                break;
+            case 2:
+                if (curr == '}'){
+                    pos = 1;
+                }
+                else if (key_pos < 100){
+                    key_buffer[key_pos++] = curr;
+                }
+                break;
+            case 3:
+                if (curr == '}'){
+                    key_buffer[key_pos] = '\0';
+                    DeleteSpaces(key_buffer);
+                    const char* value = FindValue(Data, count, key_buffer);
+                    if (value == nullptr){
+                        TemplateFile.close();
+                        if (OutputPath != nullptr){
+                            OutputFile.close();
+                        }
+                        return 1;
+                    }
+                    *OutputStream << value;
+                    pos = 0;
+                }
+                else {
+                    if (key_pos < 100){
+                        key_buffer[key_pos++] = '}';
+                        key_buffer[key_pos++] = curr;
+                    }
+                    pos = 2;
+                }
+                break;    
+        }
+        if (pos == 1 && curr == '}') {
+            pos = 3;
+        }
+    }
+    if (pos != 0){
+        TemplateFile.close();
+        if (OutputPath != nullptr){
+            OutputFile.close();
+        }
+        return 4;
+    }
+    TemplateFile.close();
+    if (OutputPath != nullptr){
+        OutputFile.close();
+    }
+    return 0;
+
 }
 
 int main(int argc, char* argv[]){
@@ -160,4 +324,12 @@ int main(int argc, char* argv[]){
     if (!CommandLine(argc, argv, TemplatePath, DataPath, OutputPath)){
         return 2;
     }
+    int count = 0;
+    Data Data[1024];
+    int result = ReadData(DataPath, Data, count);
+    if (result != 0){
+        return result;
+    }
+    result = Template(TemplatePath, OutputPath, Data, count);
+    return result;
 }

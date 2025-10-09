@@ -6,7 +6,7 @@ struct Data {
     char DataValue[101];
 };
 
-bool bCompareStringPrefix(const char* str, const char* prefix) {
+bool CompareStringPrefix(const char* str, const char* prefix) {
     int i = 0;
     while (prefix[i] != '\0') {
         if (str[i] != prefix[i]) {
@@ -17,7 +17,7 @@ bool bCompareStringPrefix(const char* str, const char* prefix) {
     return true;
 }
 
-bool bCompareString(const char* str1, const char* str2) {
+bool CompareString(const char* str1, const char* str2) {
     int i = 0;
     while (str1[i] != '\0' && str2[i] != '\0') {
         if (str1[i] != str2[i]) {
@@ -45,11 +45,11 @@ int LengthString(const char* str) {
     return length;
 }
 
-bool bIsSpace(char c) {
+bool IsSpace(char c) {
     return c == ' ' || c == '\t'  || c == '\n';
 }
 
-bool bIsValidSymbol(char c) {
+bool IsValidSymbol(char c) {
     return (c >= 'a' && c <= 'z') || 
            (c >= 'A' && c <= 'Z') || 
            (c >= '0' && c <= '9') || 
@@ -65,11 +65,11 @@ void DeleteSpaces(char* str) {
     int start = 0;
     int end = l - 1;
 
-    while (start < l && bIsSpace(str[start])) {
+    while (start < l && IsSpace(str[start])) {
         start++;
     }
 
-    while (end >= 0 && bIsSpace(str[end])) {
+    while (end >= 0 && IsSpace(str[end])) {
         end--;
     }
 
@@ -95,7 +95,7 @@ const char* FindChar(const char* str, char c) {
 
 const char* FindValue(const Data* Data, int count, const char* key) {
     for (int i = 0; i < count; i++) {
-        if (bCompareString(Data[i].DataKey, key)) {
+        if (CompareString(Data[i].DataKey, key)) {
             return Data[i].DataValue;
         }
     }
@@ -103,28 +103,28 @@ const char* FindValue(const Data* Data, int count, const char* key) {
 }
 
 bool CommandLine(int argc, char* argv[], char*& TemplatePath, char*& DataPath, char*& OutputPath){
-    bool bTemplate = false;
-    bool bData = false;
+    bool template_pr = false;
+    bool data_pr = false;
     for (int i = 1; i < argc; ++i){
-        if (bCompareString(argv[i], "-t")){
+        if (CompareString(argv[i], "-t")){
             if (i + 1 < argc){
                 TemplatePath = argv[++i];
-                bTemplate = true;
+                template_pr = true;
             }
             else {
                 return false;
             }
         }
-        else if (bCompareString(argv[i], "-d")){
+        else if (CompareString(argv[i], "-d")){
             if (i + 1 < argc){
                 DataPath = argv[++i];
-                bData = true;
+                data_pr = true;
             }
             else {
                 return false;
             }
         }
-        else if (bCompareString(argv[i], "-o")){
+        else if (CompareString(argv[i], "-o")){
             if (i + 1 < argc){
                 OutputPath = argv[++i];
             }
@@ -132,35 +132,35 @@ bool CommandLine(int argc, char* argv[], char*& TemplatePath, char*& DataPath, c
                 return false;
             }
         }
-        else if (bCompareStringPrefix(argv[i], "--template=")){
+        else if (CompareStringPrefix(argv[i], "--template=")){
             TemplatePath = argv[i] + 11;
-            bTemplate = true;
+            template_pr = true;
         }
-        else if (bCompareStringPrefix(argv[i], "--data=")){
+        else if (CompareStringPrefix(argv[i], "--data=")){
             DataPath = argv[i] + 7;
-            bData = true;
+            data_pr = true;
         }
-        else if (bCompareStringPrefix(argv[i], "--output=")){
+        else if (CompareStringPrefix(argv[i], "--output=")){
             OutputPath = argv[i] + 9;
         }
         else {
             return false;
         }
     }
-    if (!bTemplate || !bData){
+    if (!template_pr || !data_pr){
         return false;
     }
     return TemplatePath != nullptr && DataPath != nullptr;
 }
 
 int ReadData(const char* DataPath, Data* Data, int& count){
-        std::ifstream DataFile(DataPath);
-        if (!DataFile.is_open()){
+        std::ifstream data_file(DataPath);
+        if (!data_file.is_open()){
             return 3;
         }
         char line[10000];
         count = 0;
-        while (DataFile.getline(line, 10000)){
+        while (data_file.getline(line, 10000)){
             DeleteSpaces(line);
             if (line[0] == '/0'){
                 continue;
@@ -196,18 +196,18 @@ int ReadData(const char* DataPath, Data* Data, int& count){
                 continue;
             }
             for (int i = 0; i < key_l; ++i){
-                if (!bIsValidSymbol(key[i])){
+                if (!IsValidSymbol(key[i])){
                     continue;
                 }
             }
             for (int i = 0; i < value_l; ++i){
-                if (!bIsValidSymbol(value[i])){
+                if (!IsValidSymbol(value[i])){
                     continue;
                 }
             }
             bool key_repeated = false;
             for (int i = 0; i < count; ++i){
-                if (bCompareString(key, Data[i].DataKey)){
+                if (CompareString(key, Data[i].DataKey)){
                     CopyString(Data[i].DataValue, value);
                     key_repeated = true;
                     break;
@@ -221,39 +221,39 @@ int ReadData(const char* DataPath, Data* Data, int& count){
                 }
             }
         }
-        DataFile.close();
+        data_file.close();
         return 0;
 }
 
 int Template(const char* TemplatePath, const char* OutputPath, const Data* Data, int count){
-    std::ifstream TemplateFile(TemplatePath);
-    if (!TemplateFile.is_open()){
+    std::ifstream template_file(TemplatePath);
+    if (!template_file.is_open()){
         return 3;
     }
-    std::ofstream OutputFile;
-    std::ostream* OutputStream;
+    std::ofstream output_file;
+    std::ostream* output_stream;
     if (OutputPath != nullptr){
-        OutputFile.open(OutputPath);
-        if (!OutputFile.is_open()){
+        output_file.open(OutputPath);
+        if (!output_file.is_open()){
             return 3;
         }
-        OutputStream = &OutputFile;
+        output_stream = &output_file;
     }
     else {
-        OutputStream = &std::cout;
+        output_stream = &std::cout;
     }
     char curr;
     int pos = 0;
     char key_buffer[101];
     int key_pos = 0;
-    while (TemplateFile.get(curr)){
+    while (template_file.get(curr)){
         switch (pos){
             case 0:
                 if (curr == '{'){
                     pos = 1;
                 }
                 else {
-                    *OutputStream << curr;
+                    *output_stream << curr;
                 }
                 break;
             case 1:
@@ -262,7 +262,7 @@ int Template(const char* TemplatePath, const char* OutputPath, const Data* Data,
                     key_pos = 0;
                 }
                 else {
-                    *OutputStream << '{' << curr;
+                    *output_stream << '{' << curr;
                     pos = 0;
                 }
                 break;
@@ -280,13 +280,13 @@ int Template(const char* TemplatePath, const char* OutputPath, const Data* Data,
                     DeleteSpaces(key_buffer);
                     const char* value = FindValue(Data, count, key_buffer);
                     if (value == nullptr){
-                        TemplateFile.close();
+                        template_file.close();
                         if (OutputPath != nullptr){
-                            OutputFile.close();
+                            output_file.close();
                         }
                         return 1;
                     }
-                    *OutputStream << value;
+                    *output_stream << value;
                     pos = 0;
                 }
                 else {
@@ -303,33 +303,33 @@ int Template(const char* TemplatePath, const char* OutputPath, const Data* Data,
         }
     }
     if (pos != 0){
-        TemplateFile.close();
+        template_file.close();
         if (OutputPath != nullptr){
-            OutputFile.close();
+            output_file.close();
         }
         return 4;
     }
-    TemplateFile.close();
+    template_file.close();
     if (OutputPath != nullptr){
-        OutputFile.close();
+        output_file.close();
     }
     return 0;
 
 }
 
 int main(int argc, char* argv[]){
-    char* TemplatePath = nullptr;
-    char* DataPath = nullptr;
-    char* OutputPath = nullptr;
-    if (!CommandLine(argc, argv, TemplatePath, DataPath, OutputPath)){
+    char* template_path = nullptr;
+    char* data_path = nullptr;
+    char* output_path = nullptr;
+    if (!CommandLine(argc, argv, template_path, data_path, output_path)){
         return 2;
     }
     int count = 0;
-    Data Data[1024];
-    int result = ReadData(DataPath, Data, count);
+    Data data[1024];
+    int result = ReadData(data_path, data, count);
     if (result != 0){
         return result;
     }
-    result = Template(TemplatePath, OutputPath, Data, count);
+    result = Template(template_path, output_path, data, count);
     return result;
 }

@@ -25,7 +25,6 @@ bool CompareString(const char* str1, const char* str2) {
         }
         i++;
     }
-    std::cout << str1 << "//" << str2 << '\n';
     return str1[i] == str2[i];
 }
 
@@ -185,6 +184,7 @@ int ReadData(const char* DataPath, Data* Data, int& count){
                 key[i] = line[i];
             }
             key[key_l] = '\0';
+            DeleteSpaces(key);
             const char* value_start = separator + 1;
             int value_l = LengthString(value_start);
             if (value_l > 100){

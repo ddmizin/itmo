@@ -1,7 +1,7 @@
 #pragma once
 #include <cinttypes>
 #include <iostream>
-
+#include <cstdint>
 
 struct int2025_t {
     static const int SIZE = 253; 

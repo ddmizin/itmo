@@ -1,4 +1,6 @@
 #include "lab2_number.h"
+#include <cstdint>
+#include <iostream>
 
 namespace {
 
@@ -94,7 +96,7 @@ namespace {
         }
         return result;
     }
-}
+} //namespace
 
 
 int2025_t from_int(int32_t i) {

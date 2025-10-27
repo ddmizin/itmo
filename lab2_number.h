@@ -4,11 +4,11 @@
 #include <cstdint>
 
 struct int2025_t {
-    static const int SIZE = 253; 
-    static const int BYTES = 253;
-    static const int BITS = 2024; 
+    static const int kSIZE = 253; 
+    static const int kBYTES = 253;
+    static const int kBITS = 2024; 
     
-    uint8_t data[SIZE]; 
+    uint8_t data[kSIZE]; 
     bool is_positive; 
 };
 

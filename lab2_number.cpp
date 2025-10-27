@@ -5,7 +5,7 @@
 namespace {
 
     bool IsZero(const int2025_t& number){
-        for (int i = 0; i < int2025_t::SIZE; i++){
+        for (int i = 0; i < int2025_t::kSIZE; i++){
             if (number.data[i] != 0){
                 return false;
             }
@@ -15,7 +15,7 @@ namespace {
 
     void ShiftToLeft(int2025_t& number){
         uint16_t trn = 0;
-        for (int i = 0; i < int2025_t::SIZE; i++){
+        for (int i = 0; i < int2025_t::kSIZE; i++){
             uint16_t value = (number.data[i] << 1) | trn;
             number.data[i] = value & 0xFF;
             trn = value >> 8;
@@ -24,7 +24,7 @@ namespace {
 
     void ShiftToRight(int2025_t& number){
         uint8_t trn = 0;
-        for (int i = int2025_t::SIZE - 1; i >= 0; i--){
+        for (int i = int2025_t::kSIZE - 1; i >= 0; i--){
             uint8_t new_trn = number.data[i] & 1;
             number.data[i] = (number.data[i] >> 1) | (trn << 7);
             trn = new_trn;
@@ -32,7 +32,7 @@ namespace {
     }
 
      void SetZero(int2025_t& number){
-        for (int i = 0; i < int2025_t::SIZE; i++){
+        for (int i = 0; i < int2025_t::kSIZE; i++){
             number.data[i] = 0;
         }
         number.is_positive = true;
@@ -55,7 +55,7 @@ namespace {
     }
 
     int CompareAbsoluteNumber(const int2025_t& lhs, const int2025_t& rhs) {
-        for (int i = int2025_t::SIZE - 1; i >= 0; i--) {
+        for (int i = int2025_t::kSIZE - 1; i >= 0; i--) {
             if (lhs.data[i] != rhs.data[i]) {
                 if (lhs.data[i] < rhs.data[i]){
                     return -1;
@@ -72,7 +72,7 @@ namespace {
         int2025_t result;
         SetZero(result);
         uint16_t trn = 0;
-        for (int i = 0; i < int2025_t::SIZE; i++) {
+        for (int i = 0; i < int2025_t::kSIZE; i++) {
             uint16_t sum = lhs.data[i] + rhs.data[i] + trn;
             result.data[i] = sum & 0xFF;
             trn = sum >> 8;
@@ -84,7 +84,7 @@ namespace {
         int2025_t result;
         SetZero(result);
         int16_t bor = 0;
-        for (int i = 0; i < int2025_t::SIZE; i++) {
+        for (int i = 0; i < int2025_t::kSIZE; i++) {
             int16_t diff = lhs.data[i] - rhs.data[i] - bor;
             if (diff < 0) {
                 diff += 256;
@@ -106,7 +106,7 @@ int2025_t from_int(int32_t i) {
         result.is_positive = false;
         i = -i; 
     }
-    for (int j = 0; j < 4 && j < int2025_t::SIZE; j++) {
+    for (int j = 0; j < 4 && j < int2025_t::kSIZE; j++) {
         result.data[j] = (i >> (j * 8)) & 0xFF;
     }
     return result;
@@ -194,14 +194,14 @@ int2025_t operator*(const int2025_t& lhs, const int2025_t& rhs) {
     }
     int2025_t result;
     SetZero(result);
-    uint16_t temp[int2025_t::SIZE * 2] = {0};
-    for (int i = 0; i < int2025_t::SIZE; i++) {
+    uint16_t temp[int2025_t::kSIZE * 2] = {0};
+    for (int i = 0; i < int2025_t::kSIZE; i++) {
         if (lhs.data[i] == 0) {
             continue; 
         }
         uint16_t trn = 0;
         uint8_t lhs_byte = lhs.data[i];
-        for (int j = 0; j < int2025_t::SIZE; j++) {
+        for (int j = 0; j < int2025_t::kSIZE; j++) {
             if (rhs.data[j] == 0 && trn == 0) {
                 continue; 
             }
@@ -209,11 +209,11 @@ int2025_t operator*(const int2025_t& lhs, const int2025_t& rhs) {
             temp[i + j] = res & 0xFF;
             trn = res >> 8;
         }
-        if (trn > 0 && (i + int2025_t::SIZE) < (int2025_t::SIZE * 2)) {
-            temp[i + int2025_t::SIZE] += trn;
+        if (trn > 0 && (i + int2025_t::kSIZE) < (int2025_t::kSIZE * 2)) {
+            temp[i + int2025_t::kSIZE] += trn;
         }
     }
-    for (int i = 0; i < int2025_t::SIZE; i++) {
+    for (int i = 0; i < int2025_t::kSIZE; i++) {
         result.data[i] = temp[i] & 0xFF;
     }
     result.is_positive = (lhs.is_positive == rhs.is_positive);
@@ -236,7 +236,7 @@ int2025_t operator/(const int2025_t& lhs, const int2025_t& rhs) {
     divider.is_positive = true;
     int2025_t remains;
     SetZero(remains);
-    for (int i = int2025_t::BITS - 1; i >= 0; i--){
+    for (int i = int2025_t::kBITS - 1; i >= 0; i--){
         ShiftToLeft(remains);
         SetBit(remains, 0, GetBit(divisible, i));
         if (CompareAbsoluteNumber(remains, divider) >= 0){

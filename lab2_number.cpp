@@ -1,6 +1,7 @@
 #include "lab2_number.h"
 
 namespace {
+
     bool IsZero(const int2025_t& number){
         for (int i = 0; i < int2025_t::SIZE; i++){
             if (number.data[i] != 0){
@@ -9,6 +10,7 @@ namespace {
         }
         return true;
     }
+
     void ShiftToLeft(int2025_t& number){
         uint16_t trn = 0;
         for (int i = 0; i < int2025_t::SIZE; i++){
@@ -17,6 +19,7 @@ namespace {
             trn = value >> 8;
         }
     }
+
     void ShiftToRight(int2025_t& number){
         uint8_t trn = 0;
         for (int i = int2025_t::SIZE - 1; i >= 0; i--){
@@ -25,17 +28,20 @@ namespace {
             trn = new_trn;
         }
     }
+
      void SetZero(int2025_t& number){
         for (int i = 0; i < int2025_t::SIZE; i++){
-            number.data[i] = 0; 
+            number.data[i] = 0;
         }
         number.is_positive = true;
     }
+
     bool GetBit(const int2025_t& number, int bit_pos) {
         int byte = bit_pos / 8;
         int bit_in_byte = bit_pos % 8;
         return (number.data[byte] >> bit_in_byte) & 1;
     }
+
     void SetBit(int2025_t& number, int bit_pos, bool flag) {
         int byte = bit_pos / 8;
         int bit_in_byte = bit_pos % 8;
@@ -45,6 +51,7 @@ namespace {
             number.data[byte] &= ~(1 << bit_in_byte);
         }
     }
+
     int CompareAbsoluteNumber(const int2025_t& lhs, const int2025_t& rhs) {
         for (int i = int2025_t::SIZE - 1; i >= 0; i--) {
             if (lhs.data[i] != rhs.data[i]) {
@@ -58,6 +65,7 @@ namespace {
         }
         return 0;
     }
+
     int2025_t AddAbsoluteNumber(const int2025_t& lhs, const int2025_t& rhs) {
         int2025_t result;
         SetZero(result);
@@ -67,9 +75,9 @@ namespace {
             result.data[i] = sum & 0xFF;
             trn = sum >> 8;
         }
-        
         return result;
     }
+
     int2025_t SubtractAbsoluteNumber(const int2025_t& lhs, const int2025_t& rhs) {
         int2025_t result;
         SetZero(result);
@@ -102,9 +110,9 @@ int2025_t from_int(int32_t i) {
     return result;
 }
 
-int2025_t from_string(const char* str) {
+int2025_t from_string(const char* buff) {
     int2025_t result = from_int(0);
-    const char* ptr = str;
+    const char* ptr = buff;
     while (*ptr && (*ptr == ' ' || *ptr == '\t')) {
         ptr++;
     }
@@ -135,7 +143,7 @@ int2025_t from_string(const char* str) {
 }
 
 int2025_t operator+(const int2025_t& lhs, const int2025_t& rhs) {
-int2025_t result;
+    int2025_t result;
     SetZero(result);
     if (lhs.is_positive == rhs.is_positive) {
         result = AddAbsoluteNumber(lhs, rhs);
@@ -206,7 +214,7 @@ int2025_t operator*(const int2025_t& lhs, const int2025_t& rhs) {
     for (int i = 0; i < int2025_t::SIZE; i++) {
         result.data[i] = temp[i] & 0xFF;
     }
-    result.is_positive = (lhs.is_positive != rhs.is_positive);
+    result.is_positive = (lhs.is_positive == rhs.is_positive);
     return result;
 }
 
@@ -219,7 +227,7 @@ int2025_t operator/(const int2025_t& lhs, const int2025_t& rhs) {
     }
     int2025_t result;
     SetZero(result);
-    int2025_t divisible= lhs;
+    int2025_t divisible = lhs;
     int2025_t divider = rhs;
 
     divisible.is_positive = true;
@@ -234,7 +242,7 @@ int2025_t operator/(const int2025_t& lhs, const int2025_t& rhs) {
             SetBit(result, i, true);
         }
     }
-    result.is_positive = (lhs.is_positive != rhs.is_positive);
+    result.is_positive = (lhs.is_positive == rhs.is_positive);
     return result;
 }
 
@@ -242,7 +250,7 @@ bool operator==(const int2025_t& lhs, const int2025_t& rhs) {
     if (IsZero(lhs) && IsZero(rhs)){
         return true;
     }
-    if(lhs.is_positive != rhs.is_positive){
+    if (lhs.is_positive != rhs.is_positive){
         return false;
     }
     return CompareAbsoluteNumber(lhs,rhs) == 0;

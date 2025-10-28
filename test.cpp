@@ -1,17 +1,16 @@
-#include <iostream>
-#include <utility>
-#include <string>
 #include <vector>
+#include <string>
+#include <utility>
 
-void sift_down(size_t i, std::vector<int> *arr, int len){
+void sift_down(size_t i, int arr[], int n){
     while (true) {
         int l = 2 * i + 1;
         int r = 2 * i + 2;
         int max = i;
-        if (l < len && arr[l] > arr[max]) {
+        if (l < n && arr[l] > arr[max]) {
             max = l;
         }
-        if (r < len && arr[r] > arr[max]) {
+        if (r < n && arr[r] > arr[max]) {
             max = r;
         }
         if (max == i) {
@@ -22,45 +21,31 @@ void sift_down(size_t i, std::vector<int> *arr, int len){
     }
 }
 
-void sort(std::vector<int> *arr, int len){
-    for (int end = len - 1; end > 0; --end){
+void build_heap(int arr[], int n){
+    for (int i = n / 2 - 1; i >= 0; --i){
+        sift_down(i, arr, n);
+    }
+}
+
+void sort(int arr[], int n){
+    for (int end = n - 1; end > 0; --end){
         std::swap(arr[0], arr[end]);
-        --len;
-        sift_down(0, arr, len);
+        --n;
+        sift_down(0, arr, n);
     }
 }
 
 int main(){
-    int q;
-    std::cin >> q;
-    std::vector<int> arr;
-    int len = 0;
-    int result[100000];
-    int len_res = 0;
-    std::string command;
-    for (size_t i = 0; i < q; ++i){
-        std::cin >> command;
-        if (command.substr(0, 5) == "Insert"){
-            int new_n = std::stoi(command.substr(6, command.length() - 1));
-            ++len;
-            arr.push_back(new_n);
-            sort(arr, len);
-        }
-        if (command.substr(0, 5) == "GetMin"){
-            result[len_res] = arr[0];
-            ++len_res;
-            --len;
-            arr.erase(arr.begin());
-        }
-        if (command.substr(0, 5) == "GetMax"){
-            result[len_res] = arr.back();
-            ++len_res;
-            --len;
-            arr.pop_back();
-        }
+    int n;
+    std::cin >> n;
+    int arr[n];
+    for (size_t i = 0; i < n; ++i){
+        std::cin >> arr[i];
     }
 
-    for (int i = 0; i < len_res; ++i){
-        std::cout << result[i] << '\n';
+    build_heap(arr, n);
+    sort(arr, n);
+    for (size_t i = 0; i < n; ++i){
+        std::cout << arr[i] << " ";
     }
 }

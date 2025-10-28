@@ -5,18 +5,18 @@ void sift_down(size_t i, int arr[], int n){
     while (true) {
         int l = 2 * i + 1;
         int r = 2 * i + 2;
-        int min = i;
-        if (l < n && arr[l] < arr[min]) {
-            min = l;
+        int max = i;
+        if (l < n && arr[l] > arr[max]) {
+            max = l;
         }
-        if (r < n && arr[r] < arr[min]) {
-            min = r;
+        if (r < n && arr[r] > arr[max]) {
+            max = r;
         }
-        if (min == i) {
+        if (max == i) {
             break;
         }
-        std::swap(arr[i], arr[min]);
-        i = min;
+        std::swap(arr[i], arr[max]);
+        i = max;
     }
 }
 

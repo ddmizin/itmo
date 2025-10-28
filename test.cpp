@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-void sift_down(size_t i, std::vector<int> arr, int len){
+void sift_down(size_t i, std::vector<int> *arr, int len){
     while (true) {
         int l = 2 * i + 1;
         int r = 2 * i + 2;
@@ -22,7 +22,7 @@ void sift_down(size_t i, std::vector<int> arr, int len){
     }
 }
 
-void sort(std::vector<int> arr, int len){
+void sort(std::vector<int> *arr, int len){
     for (int end = len - 1; end > 0; --end){
         std::swap(arr[0], arr[end]);
         --len;

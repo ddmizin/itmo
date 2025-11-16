@@ -3,21 +3,31 @@
 #include <algorithm>
 
 int main() {
-    int W, n;
-    std::cin >> W >> n;
-    
-    std::vector <int> weights(n);
+    int n, m;
+    std::cin >> n;
+    std::vector <int> a(n);
     for (int i = 0; i < n; i++) {
-        std::cin >> weights[i];
+        std::cin >> a[i];
     }
     
-    std::vector <int> d(W + 1, 0);
+    std::cin >> m;
+    std::vector <int> b(m);
+    for (int i = 0; i < m; i++) {
+        std::cin >> b[i];
+    }
     
-    for (int i = 0; i < n; i++) {
-        int w = weights[i];
-        for (int j = W; j >= w; j--) {
-            d[j] = std::max(d[j], d[j - w] + w);
+    std::vector <std::vector <int>> d(n + 1, std::vector <int>(m + 1, 0));
+    
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            if (a[i - 1] == b[j - 1]) {
+                d[i][j] = d[i - 1][j - 1] + 1;
+            } 
+            else {
+                d[i][j] = std::max(d[i - 1][j], d[i][j - 1]);
+            }
         }
     }
-    std::cout << d[W];
+    
+    std::cout << d[n][m];
 }

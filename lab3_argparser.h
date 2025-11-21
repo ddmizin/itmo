@@ -90,6 +90,6 @@ bool GetRepeated(ArgumentParser parser, const char* name, int index, int* value)
 bool GetRepeated(ArgumentParser parser, const char* name, int index, float* value);
 bool GetRepeated(ArgumentParser parser, const char* name, int index, const char** value);
 
-} // namespace nargparse
+}
 
 #endif 
